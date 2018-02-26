@@ -1,9 +1,22 @@
 db.operation_log.aggregate(
+{
+  "$match" : {
+    				"module" : 
+    				{ "$in" : ["04","02"] }	
+  			 }
+},
+{
+  "$project" : {
+    			 "module" : 1,
+    			 "time"	: 1	,
+    			 "giz" : "$giz2"
+  				}
+},
 {	
   "$group":
   			{
   			  "_id" : "$module",
-  			  "count" : { "$sum" : NumberInt(1) },
+  			  "count" : { "$sum" : 1 },
   			  "total_time" : { "$sum" : "$time" }
   			}
 },
@@ -12,8 +25,12 @@ db.operation_log.aggregate(
   			{
   			  "count" : -1
   			}
+},
+{
+	"$limit": 5
 }
 )
+
 
 var cursor = db.operation_log.find({"_id":"45f93c8c33b8423ea8640fa9571e4703"});
 
