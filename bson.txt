@@ -1,0 +1,26 @@
+db.operation_log.aggregate(
+{	
+  "$group":
+  			{
+  			  "_id" : "$module",
+  			  "count" : { "$sum" : NumberInt(1) },
+  			  "total_time" : { "$sum" : "$time" }
+  			}
+},
+{
+  "$sort" : 
+  			{
+  			  "count" : -1
+  			}
+}
+)
+
+var cursor = db.operation_log.find({"_id":"45f93c8c33b8423ea8640fa9571e4703"});
+
+
+
+db.operation_log.find({}).forEach(function(x){
+  x.time=NumberLong(x.time);
+ // db.operation_log.save(x);
+ db.operation_log.update({"_id":x._id},{"$set":{"value":NumberLong(x.time)}});
+});
