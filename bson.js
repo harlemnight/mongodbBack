@@ -94,3 +94,21 @@ db.runCommand({
     sort: {  },
     inputDB: "LogMgr",
  });
+
+
+for ( i = 0 ; i < 1000000 ; i++ ) {
+  db.users.insert(
+    {
+    "i" : i,
+    "username" : "jeff"+i,
+    "createAt" : new Date()
+    }
+  ) ;
+}
+
+
+db.users.find().explain("executionStats")
+
+db.users.find({ 
+    "username" : "jeff101"
+}).explain("executionStats")
