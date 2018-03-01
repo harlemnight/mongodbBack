@@ -1,3 +1,7 @@
+//固定集合 size 是字节大小  max是文档数量大小
+db.createCollection("collectname",{"capped" : true,"size" : 1000, "max" : 10})
+
+
 //高级聚合查询
 db.operation_log.aggregate(
 {
@@ -127,11 +131,32 @@ db.users.ensureIndex({"username" : 1,"age" : 1 },{ "background" , true })
 //关闭副本 以独立服务器启动建立索引 然后重复 直到全部副本建立完
 //主节点 1.于最后在后台backgroud 建立索引
 //       2.类似副本关闭 独立启动 建立 
+//分片集 把每个分片当作一个独立的副本 但不需要重启 只需要关闭均衡器 新分片会自动的
+
+//删除索引 "indexname"  为 * 则删除所有索引 除(_id索引)
+db.runCommand({"dropIndexes":"babies","index":"indexname"})  
 
 //获取集合的索引信息
 db.users.getIndexes() 
 
+
+//全文索引
+//启动时添加参数 或者调用时添加命令
+//setParameter textSearchEnabled = true
+//2.0中不能用于普通查询
+db.topics.ensureIndex({"title" : "text"})
+
+
+//内存溢出 建立索引可能会引发内存溢出
+//var/log/messages/ 会记录 OOM killer 操作 增加内存 swap 后台建立索引 
+
+//TTL 索引可以用于保存会话 
+
+
+//数据自定义预热 就是把相关重要的数据放入内存
+//
 db.currentOp()
+
 
 //kill session
 db.killOp(var opid)
@@ -179,3 +204,35 @@ db.createUser(
    }
 )
 
+//mongodb 日志系统 类似于oracle redo日志
+//data/db/journal   默认60秒 写入磁盘
+//
+//
+
+//gridFS 二进制存储
+// foo.txt
+// "hello,worid"
+./mongofiles put foo.txt
+....
+....
+done!
+./mongofiles list
+..
+..
+foo.txt
+
+rm foo.txt
+./mongofiles get foo.txt
+...
+done write to : foo.txt
+cat foo.txt
+hello,worid
+
+//使用3T操作 gridFS
+先add Buckets
+例如  fl_text
+  Buckets相当于对文件进行分类 可以从应用层上去考虑
+会在相应数据库下生成2个集合
+1个集合存储文件元数据 fl_text.chunks
+1个集合存储文件内容   fl_text.files 如果文件超过 chunk大小则会记录成多个文档
+就是多行数据
