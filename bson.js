@@ -112,6 +112,7 @@ for ( i = 0 ; i < 1000000 ; i++ ) {
   ) ;
 }
 
+
 //执行计划
 db.users.find().explain("executionStats")
 //执行计划
@@ -119,6 +120,13 @@ db.users.find({
     "username" : "jeff101"
 }).explain("executionStats")
 
+//创建索引  backgroud true 是后台处理
+db.users.ensureIndex({"username" : 1,"age" : 1 },{ "background" , true })
+
+//副本级索引建立
+//关闭副本 以独立服务器启动建立索引 然后重复 直到全部副本建立完
+//主节点 1.于最后在后台backgroud 建立索引
+//       2.类似副本关闭 独立启动 建立 
 
 //获取集合的索引信息
 db.users.getIndexes() 
@@ -139,11 +147,35 @@ db.users.stats(1024*1024)
 //数据库级的
 db.stats()
 
+
+
+//设置权限 类似于oracle 的用户
+#security:
+#    authorization: enabled
+
+//
+show dbs
 //3.0 以后不再支持addUser new is follow
+////创建用户必须切换到要建立用户的数据库下面
+/////如管理员账户 
+///
+///
+use admin
+
 db.createUser(
    {
-     user: "accountUser",
-     pwd: "password",
-     roles: [ "readWrite", "dbAdmin" ]
+     user: "root",
+     pwd: "gigi117zyd",
+     roles: ["root"]
    }
 )
+
+use education;
+db.createUser(
+   {
+     user: "education",
+     pwd: "gigi117zyd2",
+     roles: ["dbOwner"]
+   }
+)
+
