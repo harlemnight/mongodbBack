@@ -135,3 +135,15 @@ db.setProfilingLevel(2);
 
 //查询集合统计信息
 db.users.stats(1024*1024)
+
+//数据库级的
+db.stats()
+
+//3.0 以后不再支持addUser new is follow
+db.createUser(
+   {
+     user: "accountUser",
+     pwd: "password",
+     roles: [ "readWrite", "dbAdmin" ]
+   }
+)
