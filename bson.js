@@ -1,3 +1,4 @@
+//高级聚合查询
 db.operation_log.aggregate(
 {
   "$match" : {
@@ -31,14 +32,16 @@ db.operation_log.aggregate(
 }
 )
 
-
+//打开游标
 var cursor = db.operation_log.find({"_id":"45f93c8c33b8423ea8640fa9571e4703"});
 
-
+//增加字段
 db.operation_log.update({}, {$set: {txt:""}}, {multi: 1})
-
+//删除字段
 db.operation_log.update({},{$unset:{txt:''}}, {multi: 1})
 
+
+//更新字段的类型
 db.operation_log.find({}).forEach(function(x){
   x.time=NumberLong(x.time);
  // db.operation_log.save(x);
@@ -48,6 +51,8 @@ db.operation_log.find({}).forEach(function(x){
 
 // *** 3T Software Labs, Studio 3T: MapReduce Job ****
 
+
+//mapreduce 过程
 // Variable for map
 var __3tsoftwarelabs_map = function () {
 
@@ -96,6 +101,7 @@ db.runCommand({
  });
 
 
+//循环插入
 for ( i = 0 ; i < 1000000 ; i++ ) {
   db.users.insert(
     {
@@ -106,9 +112,26 @@ for ( i = 0 ; i < 1000000 ; i++ ) {
   ) ;
 }
 
-
+//执行计划
 db.users.find().explain("executionStats")
-
+//执行计划
 db.users.find({ 
     "username" : "jeff101"
 }).explain("executionStats")
+
+
+//获取集合的索引信息
+db.users.getIndexes() 
+
+db.currentOp()
+
+//kill session
+db.killOp(var opid)
+
+//系统分析器 类似于oracle 审计 会记录所有操作
+//一般不开启 0 关闭  1级 2级 所有类型操作
+//slowms 值即使 setprofilinglevel =0 关闭也会记录耗时slowms设定值的操作哦
+db.setProfilingLevel(2);
+
+//查询集合统计信息
+db.users.stats(1024*1024)
